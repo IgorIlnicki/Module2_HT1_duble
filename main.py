@@ -1,7 +1,31 @@
 import sqlite3
+DBname = 'databaz2.db'
+
+def delete_user_by_fullname(fullname):  # 15 Видалити користувача та пов'язані завдання
+    try:
+        conn = sqlite3.connect(DBname)
+        c = conn.cursor()
+        c.execute("PRAGMA foreign_keys = ON")  # Включення каскадного видалення
+        # Отримати ідентифікатор користувача за повним іменем
+        c.execute("SELECT id FROM users WHERE fullname = ?", (fullname,))
+        user_id = c.fetchone()   #  витягуємо перший елемент з кортежу (він всього один)
+        if user_id is None:
+            print("Користувача з повним іменем <{}> не знайдено.".format(fullname))
+            return
+        # Видалення користувача
+        c.execute("DELETE FROM users WHERE id = ?", user_id)
+        conn.commit()
+        print("Користувача <{}> та пов'язану інформацію успішно видалено.".format(fullname))
+
+    except sqlite3.Error as e:
+        print("Помилка видалення користувача та пов'язаної інформації:", e)
+
+    finally:
+        if conn:
+            conn.close()
 
 def get_users_and_task_counts():  # 14 Отримання списку користувачів і кількості їхніх завдань
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для отримання користувачів і кількості їхніх завдань
     c.execute("""
@@ -15,7 +39,7 @@ def get_users_and_task_counts():  # 14 Отримання списку кори�
     return users_and_task_counts
 
 def get_users_and_tasks_in_progress():  # 13 # Отримання списку користувачів і їхніх завдань, які виконуються
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для отримання користувачів і їхніх завдань, які виконуються <in progress>
     c.execute("""
@@ -30,7 +54,7 @@ def get_users_and_tasks_in_progress():  # 13 # Отримання списку �
     return users_and_tasks
 
 def get_tasks_without_description():  # 12 Отримання завдань, які не мають опису
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для отримання завдань, які не мають опису.
     c.execute("""
@@ -45,7 +69,7 @@ def get_tasks_without_description():  # 12 Отримання завдань, я
     return tasks
 
 def get_tasks_for_users_with_domain(domain): # 11 отримання завдань, призначених користувачам із певною доменною частиною електронної пошти
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для отримання завдань, призначених користувачам із певною доменною частиною електронної пошти
     c.execute("""
@@ -60,7 +84,7 @@ def get_tasks_for_users_with_domain(domain): # 11 отримання завда�
     return tasks
 
 def get_task_count_by_status():  # 10 Отримати кількість завдань для кожного статусу
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб отримати кількість завдань для кожного статусу
     c.execute("""
@@ -74,7 +98,7 @@ def get_task_count_by_status():  # 10 Отримати кількість зав
     return task_counts
 
 def update_username(user_id, new_fullname):  # 9 Оновлення імені (повного імені) певного користувача 
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для оновлення імені певного користувача
     c.execute("""
@@ -86,7 +110,7 @@ def update_username(user_id, new_fullname):  # 9 Оновлення імені (
     conn.close()
 
 def find_users_by_email(email):  # 8  знайти користувачів із певною електронною поштою
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб знайти користувачів із певною електронною поштою
     c.execute("""
@@ -99,7 +123,7 @@ def find_users_by_email(email):  # 8  знайти користувачів із
     return users
 
 def delete_task(task_id):  #  7  видалення конкретного завдання за його ідентифікатором
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для видалення конкретного завдання за його ідентифікатором
     c.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
@@ -107,7 +131,7 @@ def delete_task(task_id):  #  7  видалення конкретного за�
     conn.close()
 
 def get_tasks_not_completed():  # 6  отримати завдання, статус яких не "виконано"
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб отримати завдання, статус яких не "виконано"
     c.execute("""
@@ -126,7 +150,7 @@ def get_tasks_not_completed():  # 6  отримати завдання, стат
     return tasks
 
 def add_task(title, description, status_id, user_id): # 5 Додати нове завдання для конкретного користувача
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб вставити нове завдання
     c.execute("""
@@ -138,7 +162,7 @@ def add_task(title, description, status_id, user_id): # 5 Додати нове 
 
 
 def get_users_without_tasks(): # 4 отримати список користувачів, які не мають жодних завдань.
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб отримати список користувачів, які не мають жодних завдань.
     c.execute("""
@@ -154,7 +178,7 @@ def get_users_without_tasks(): # 4 отримати список користу�
     return users
 
 def update_task_status(task_id, new_status):   # 3 запит для оновлення статусу певного завдання
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит для оновлення статусу певного завдання
     c.execute("""
@@ -170,7 +194,7 @@ def update_task_status(task_id, new_status):   # 3 запит для оновл�
     conn.close()
 
 def get_tasks_by_status(status_name):  # 2  отримати завдання з певним статусом
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб отримати завдання з певним статусом
     c.execute("""
@@ -189,7 +213,7 @@ def get_tasks_by_status(status_name):  # 2  отримати завдання з
     return tasks
 
 def get_tasks_by_user_id(user_id):  # 1 отримати завдання певного користувача за його ідентифікатором
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
     # SQL-запит, щоб отримати завдання певного користувача за його ідентифікатором
     c.execute("""SELECT tasks.id, tasks.title, tasks.description, users.fullname, status.name AS status_name
@@ -201,6 +225,10 @@ def get_tasks_by_user_id(user_id):  # 1 отримати завдання пев
     tasks = c.fetchall()
     conn.close()
     return tasks
+
+def pripe_delete_user_by_fullname(args): # 15
+    new_fullname = " ".join([args[0], args[1]])
+    delete_user_by_fullname(new_fullname)
 
 def pripe_get_users_and_task_counts():  # 14
     users_and_task_counts = get_users_and_task_counts()
@@ -375,6 +403,7 @@ def main():
     print("Get_users_without_tasks\nAdd_task\nGet_tasks_not_completed\nDelete_task [task_id]\nFind_by_email [email]")
     print("Update_username [user_id] [new_name]\nGet_task_count_by_status\nget_tasks_for_users_with_domain [domain]")
     print("Get_tasks_without_description\nGet_users_and_tasks_in_progress\nGet_users_and_task_counts")
+    print("delete_user_by_fullname [name] [last name]")
     while True: 
             user_input = input("Введіть команду: ")
             command, *args = parse_input(user_input)
@@ -410,6 +439,8 @@ def main():
                 pripe_get_users_and_tasks_in_progress()
             elif command == "get_users_and_task_counts":  # 14
                 pripe_get_users_and_task_counts()
+            elif command == "delete_user_by_fullname":  # 15
+                pripe_delete_user_by_fullname(args)
 
 if __name__ == "__main__":
     main()

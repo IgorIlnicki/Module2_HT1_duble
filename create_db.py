@@ -1,10 +1,9 @@
 import sqlite3
-
+DBname = 'databaz2.db'
 def create_tables():
     # Підключення до бази даних SQLite (створюється, якщо вона не існує)
-    conn = sqlite3.connect('datab.db')
+    conn = sqlite3.connect(DBname)
     c = conn.cursor()
-
     # Створити таблицю БД users
     c.execute('''CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY,
@@ -30,8 +29,12 @@ def create_tables():
                     description TEXT,
                     status_id INTEGER,
                     user_id INTEGER,
-                    FOREIGN KEY (status_id) REFERENCES status(id) ON DELETE SET NULL,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    FOREIGN KEY (status_id) REFERENCES status(id) 
+                            ON DELETE CASCADE
+                            ON UPDATE CASCADE
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                            ON DELETE CASCADE
+                            ON UPDATE CASCADE
                  )''')
 
     # Commit changes and close connection
